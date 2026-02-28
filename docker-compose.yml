@@ -40,3 +40,6 @@ services:
     depends_on:
       - db
       - redis
+
+volumes:
+  db_data: {}
