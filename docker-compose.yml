@@ -34,10 +34,16 @@ services:
       - DISABLE_VIDEO_STREAMING=False
       - ONNXRUNTIME_DISABLE_GPU=1
       - DEBUG=False
-      - SITE_ID=2
-    ports:
+ports:
       - "3334:3334"
     depends_on:
       - db
       - redis
+    networks:
+      - internal_net
+volumes:
+  db_data:
 
+networks:
+  internal_net:
+    driver: bridge
