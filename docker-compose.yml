@@ -22,7 +22,7 @@ services:
       - internal_net
 
   obico-server:
-    image: ghcr.io/imagegenius/obico:latest
+    build: .   # usa o Dockerfile customizado no diretório atual
     container_name: obico-server
     restart: unless-stopped
     environment:
@@ -37,10 +37,12 @@ services:
       - JANUS_HTTP_URL=https://umbrel.tailc9398a.ts.net/janus
       - DISABLE_VIDEO_STREAMING=False
       - ONNXRUNTIME_DISABLE_GPU=1
-      - DEBUG=False
-      - HOST_IP=192.168.100.105:3334,umbrel:3334,umbrel.tailc9398a.ts.net:3334
+      - DEBUG=True
+      - SITE_ID=1
+      - HOST_IP=192.168.100.105:3334
     ports:
-      - "3334:3334"
+      - "3334:3334"   # porta principal do Obico
+      - "8000:8000"   # painel admin + WebSocket via Daphne
     depends_on:
       - db
       - redis
