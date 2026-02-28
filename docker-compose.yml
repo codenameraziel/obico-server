@@ -1,6 +1,6 @@
 services:
   obico:
-    build: .
+    build: ./obico
     container_name: obico-server
     ports:
       - "3334:3334"
