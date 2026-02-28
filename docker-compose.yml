@@ -30,14 +30,15 @@ services:
       - DATABASE_URL=postgres://obico:obico@db:5432/obico
       - REDIS_URL=redis://redis:6379
       - SECRET_KEY=2139cb7e6814e5ad7e145338964031acf66abce3d1f7f386e2cdd2cd4a8b42404599de602fd7646f2233231dba70b6969821
-      - OBICO_AUTH_TOKEN=655105
-      - MOONRAKER_URL=http://moonraker:7125
+      #- OBICO_AUTH_TOKEN=655105
+      #- MOONRAKER_URL=http://moonraker:7125
       - VIDEO_STREAMING_BACKEND=janus
       - JANUS_URL=wss://umbrel.tailc9398a.ts.net/ws
       - JANUS_HTTP_URL=https://umbrel.tailc9398a.ts.net/janus
       - DISABLE_VIDEO_STREAMING=False
       - ONNXRUNTIME_DISABLE_GPU=1
       - DEBUG=False
+      - HOST_IP=192.168.100.105:3334,umbrel:3334,umbrel.tailc9398a.ts.net:3334
     ports:
       - "3334:3334"
     depends_on:
