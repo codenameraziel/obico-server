@@ -1,6 +1,4 @@
-Django>=3.2
-gunicorn
-gevent
+django
+channels
+daphne
 psycopg2-binary
-redis
-requests
