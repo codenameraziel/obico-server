@@ -13,6 +13,11 @@ services:
       - db_data:/var/lib/postgresql/data
     networks:
       - internal_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U obico -d obico"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7.2-alpine
@@ -29,7 +34,7 @@ services:
       - DJANGO_ALLOWED_HOSTS=192.168.100.105,umbrel,umbrel.tailc9398a.ts.net,localhost,127.0.0.1
       - DATABASE_URL=postgres://obico:obico@db:5432/obico
       - REDIS_URL=redis://redis:6379
-      - SECRET_KEY=2139cb7e6814e5ad7e145338964031acf66abce3d1f7f386e2cdd2cd4a8b42404599de602fd7646f2233231dba70b6969821
+      - DJANGO_SECRET_KEY=2139cb7e6814e5ad7e145338964031acf66abce3d1f7f386e2cdd2cd4a8b42404599de602fd7646f2233231dba70b6969821
       #- OBICO_AUTH_TOKEN=655105
       #- MOONRAKER_URL=http://moonraker:7125
       - VIDEO_STREAMING_BACKEND=janus
@@ -42,11 +47,12 @@ services:
       - SITE_ID=1
       - HOST_IP=192.168.100.105:3334
     ports:
-      - "3334:3334"   # porta principal do Obico
-      - "8000:8000"   # painel admin + WebSocket via Daphne
+      - "3334:3334"
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     networks:
       - internal_net
 
