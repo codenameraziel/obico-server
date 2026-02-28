@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   obico:
-    build: ./obico
+    build: .
     container_name: obico-server
     ports:
       - "3334:3334"
@@ -12,13 +12,11 @@ services:
       - HOST_IP=192.168.100.105:3334,umbrel.tailc9398a.ts.net:3334
       - REDIS_URL=redis://redis:6379
       - DATABASE_URL=postgres://obico:obico@db:5432/obico
-      - ONNXRUNTIME_DISABLE_GPU=1
+      - ONNXRUNTIME_DISABLE_GPU=1   # força CPU, evita erro de CUDA
       - VIDEO_STREAMING_BACKEND=janus
       - JANUS_URL=wss://umbrel.tailc9398a.ts.net/ws
       - JANUS_HTTP_URL=https://umbrel.tailc9398a.ts.net/janus
       - DISABLE_VIDEO_STREAMING=False
-      #- OBICO_AUTH_TOKEN=655105
-      #- MOONRAKER_URL=http://moonraker:7125
     depends_on:
       - db
       - redis
