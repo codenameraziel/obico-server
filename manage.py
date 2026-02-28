@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import os
 import sys
 
@@ -9,7 +9,8 @@ def main():
         from django.core.management import execute_from_command_line
     except ImportError as exc:
         raise ImportError(
-            "Não foi possível importar Django. Está instalado?"
+            "Nao foi possivel importar Django. "
+            "Verifique se esta instalado e se o requirements.txt contem 'Django'."
         ) from exc
     execute_from_command_line(sys.argv)
 

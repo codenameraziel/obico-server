@@ -1,66 +1,50 @@
-version: '3.7'
+version: "3.7"
 
 services:
-  db:
-    image: postgres:14
-    container_name: obico-db
+  obico:
+    image: ghcr.io/imagegenius/obico:latest
+    container_name: obico-server
+    ports:
+      - "3334:3334"
+    environment:
+      - DJANGO_SUPERUSER_EMAIL=root@example.com
+      - DJANGO_SUPERUSER_PASSWORD=supersecret
+      - HOST_IP=192.168.100.105:3334,umbrel.tailc9398a.ts.net:3334
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgres://obico:obico@db:5432/obico
+      - ONNXRUNTIME_DISABLE_GPU=1
+      - VIDEO_STREAMING_BACKEND=janus
+      - JANUS_URL=wss://umbrel.tailc9398a.ts.net/ws
+      - JANUS_HTTP_URL=https://umbrel.tailc9398a.ts.net/janus
+      - DISABLE_VIDEO_STREAMING=False
+      #- OBICO_AUTH_TOKEN=655105
+      #- MOONRAKER_URL=http://moonraker:7125
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - obico_data:/app/data
     restart: unless-stopped
+
+  db:
+    image: postgres:13
+    container_name: obico-db
     environment:
       - POSTGRES_USER=obico
       - POSTGRES_PASSWORD=obico
       - POSTGRES_DB=obico
     volumes:
       - db_data:/var/lib/postgresql/data
-    networks:
-      - internal_net
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U obico -d obico"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    restart: unless-stopped
 
   redis:
-    image: redis:7.2-alpine
+    image: redis:6
     container_name: obico-redis
+    volumes:
+      - redis_data:/data
     restart: unless-stopped
-    networks:
-      - internal_net
-
-  obico-server:
-    build: ./obico-main
-    container_name: obico-server
-    restart: unless-stopped
-    environment:
-      - DJANGO_ALLOWED_HOSTS=192.168.100.105,umbrel,umbrel.tailc9398a.ts.net,localhost,127.0.0.1
-      - DATABASE_URL=postgres://obico:obico@db:5432/obico
-      - REDIS_URL=redis://redis:6379
-      - DJANGO_SECRET_KEY=2139cb7e6814e5ad7e145338964031acf66abce3d1f7f386e2cdd2cd4a8b42404599de602fd7646f2233231dba70b6969821
-      #- OBICO_AUTH_TOKEN=655105
-      #- MOONRAKER_URL=http://moonraker:7125
-      - VIDEO_STREAMING_BACKEND=janus
-      - JANUS_URL=wss://umbrel.tailc9398a.ts.net/ws
-      - JANUS_HTTP_URL=https://umbrel.tailc9398a.ts.net/janus
-      - DISABLE_VIDEO_STREAMING=False
-      - USE_GPU=False
-      - ONNXRUNTIME_DISABLE_GPU=1
-      - DEBUG=True
-      - SITE_ID=1
-      - HOST_IP=192.168.100.105:3334
-    ports:
-      - "3334:3334"
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_started
-    networks:
-      - internal_net
 
 volumes:
   db_data:
   obico_data:
   redis_data:
-
-networks:
-  internal_net:
-    driver: bridge
