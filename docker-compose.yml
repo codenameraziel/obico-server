@@ -22,7 +22,7 @@ services:
     container_name: obico-server
     restart: unless-stopped
     environment:
-      - DJANGO_ALLOWED_HOSTS=192.168.100.105:3334,umbrel:3334,umbrel.tailc9398a.ts.net:3334,localhost:3334,127.0.0.1:3334
+      - DJANGO_ALLOWED_HOSTS=umbrel:3334,umbrel.tailc9398a.ts.net:3334,localhost:3334,127.0.0.1:3334
       - DATABASE_URL=postgres://obico:obico@db:5432/obico
       - REDIS_URL=redis://redis:6379
       - SECRET_KEY=2139cb7e6814e5ad7e145338964031acf66abce3d1f7f386e2cdd2cd4a8b42404599de602fd7646f2233231dba70b6969821
