@@ -12,7 +12,7 @@ services:
       - HOST_IP=192.168.100.105:3334,umbrel.tailc9398a.ts.net:3334
       - REDIS_URL=redis://redis:6379
       - DATABASE_URL=postgres://obico:obico@db:5432/obico
-      - ONNXRUNTIME_DISABLE_GPU=1   # força CPU, evita erro de CUDA
+      - ONNXRUNTIME_DISABLE_GPU=1
       - VIDEO_STREAMING_BACKEND=janus
       - JANUS_URL=wss://umbrel.tailc9398a.ts.net/ws
       - JANUS_HTTP_URL=https://umbrel.tailc9398a.ts.net/janus
@@ -23,6 +23,10 @@ services:
     volumes:
       - obico_data:/app/data
     restart: unless-stopped
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py createsuperuser --noinput &&
+             daphne -b 0.0.0.0 -p 3334 obico.asgi:application"
 
   db:
     image: postgres:13
