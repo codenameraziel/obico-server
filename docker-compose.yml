@@ -11,11 +11,15 @@ services:
       - POSTGRES_DB=obico
     volumes:
       - db_data:/var/lib/postgresql/data
+    networks:
+      - internal_net
 
   redis:
     image: redis:7.2-alpine
     container_name: obico-redis
     restart: unless-stopped
+    networks:
+      - internal_net
 
   obico-server:
     image: ghcr.io/imagegenius/obico:latest
@@ -34,15 +38,16 @@ services:
       - DISABLE_VIDEO_STREAMING=False
       - ONNXRUNTIME_DISABLE_GPU=1
       - DEBUG=False
-ports:
+    ports:
       - "3334:3334"
     depends_on:
       - db
       - redis
     networks:
       - internal_net
+
 volumes:
-  db_data:
+  db_data: {}
 
 networks:
   internal_net:
