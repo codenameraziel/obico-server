@@ -83,7 +83,7 @@ services:
     <<: *web-defaults
     hostname: web
     env_file:
-      - .env
+      - /.env
     ports:
       - "3334:3334"
     depends_on:
