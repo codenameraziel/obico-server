@@ -36,6 +36,7 @@ services:
       - JANUS_URL=wss://umbrel.tailc9398a.ts.net/ws
       - JANUS_HTTP_URL=https://umbrel.tailc9398a.ts.net/janus
       - DISABLE_VIDEO_STREAMING=False
+      - USE_GPU=False
       - ONNXRUNTIME_DISABLE_GPU=1
       - DEBUG=True
       - SITE_ID=1
