@@ -1,6 +1,6 @@
 services:
   obico:
-    build: ./obico
+    image: obicoghcr.io/gabe565/obico/ml-api
     container_name: obico-server
     ports:
       - "3334:3334"
