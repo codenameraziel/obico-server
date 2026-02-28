@@ -22,7 +22,7 @@ services:
       - internal_net
 
   obico-server:
-    build: ./ghcr.io/imagegenius/obico:latest
+    build: ./obico-main
     container_name: obico-server
     restart: unless-stopped
     environment:
