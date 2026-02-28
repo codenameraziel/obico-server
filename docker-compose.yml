@@ -22,7 +22,7 @@ services:
       - internal_net
 
   obico-server:
-    build: .   # usa o Dockerfile customizado no diretório atual
+    build: ./ghcr.io/imagegenius/obico:latest
     container_name: obico-server
     restart: unless-stopped
     environment:
