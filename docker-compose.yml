@@ -50,7 +50,9 @@ services:
       - internal_net
 
 volumes:
-  db_data: {}
+  db_data:
+  obico_data:
+  redis_data:
 
 networks:
   internal_net:
