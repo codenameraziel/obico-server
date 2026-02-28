@@ -1,8 +1,41 @@
-version: '3.7'
+x-web-defaults: &web-defaults
+  restart: unless-stopped
+  build:
+    context: backend
+    dockerfile: 'Dockerfile'
+  volumes:
+    - ./backend:/app
+    - ./frontend:/frontend
+  depends_on:
+    - redis
+    - db
+  environment:
+    OCTOPRINT_TUNNEL_PORT_RANGE: '0-0'
+    EMAIL_HOST: '${EMAIL_HOST-}'
+    EMAIL_HOST_USER: '${EMAIL_HOST_USER-}'
+    EMAIL_HOST_PASSWORD: '${EMAIL_HOST_PASSWORD-}'
+    EMAIL_PORT: '${EMAIL_PORT-587}'
+    EMAIL_USE_TLS: '${EMAIL_USE_TLS-True}'
+    DEFAULT_FROM_EMAIL: '${DEFAULT_FROM_EMAIL-changeme@example.com}'
+    DEBUG: '${DEBUG-False}'
+    ADMIN_IP_WHITELIST: '${ADMIN_IP_WHITELIST-}'
+    SITE_USES_HTTPS: '${SITE_USES_HTTPS-False}'
+    SITE_IS_PUBLIC: '${SITE_IS_PUBLIC-False}'
+    CSRF_TRUSTED_ORIGINS: '${CSRF_TRUSTED_ORIGINS-}'
+    SOCIAL_LOGIN: '${SOCIAL_LOGIN-False}'
+    REDIS_URL: '${REDIS_URL-redis://redis:6379}'
+    DATABASE_URL: '${DATABASE_URL-postgres://obico:obico@db:5432/obico}'
+    INTERNAL_MEDIA_HOST: '${INTERNAL_MEDIA_HOST-http://web:3334}'
+    ML_API_HOST: '${ML_API_HOST-http://ml_api:3333}'
+    ACCOUNT_ALLOW_SIGN_UP: '${ACCOUNT_ALLOW_SIGN_UP-False}'
+    WEBPACK_LOADER_ENABLED: '${WEBPACK_LOADER_ENABLED-False}'
+    DJANGO_SECRET_KEY: '${DJANGO_SECRET_KEY-}'
+    VERSION:
 
 services:
   db:
     image: postgres:14
+    hostname: db
     container_name: obico-db
     restart: unless-stopped
     environment:
@@ -15,44 +48,101 @@ services:
       - internal_net
 
   redis:
-    image: redis:7.2-alpine
-    container_name: obico-redis
     restart: unless-stopped
+    image: redis:7.2-alpine
+    hostname: redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping" ]
+      start_period: 15s
+      interval: 15s
+      timeout: 10s
+      retries: 20
     networks:
       - internal_net
 
-  obico-server:
-    build: ./obico-main
-    container_name: obico-server
+  ml_api:
+    hostname: ml_api
     restart: unless-stopped
+    build:
+      context: ml_api
     environment:
-      - DJANGO_ALLOWED_HOSTS=192.168.100.105,umbrel,umbrel.tailc9398a.ts.net,localhost,127.0.0.1
-      - DATABASE_URL=postgres://obico:obico@db:5432/obico
-      - REDIS_URL=redis://redis:6379
-      - SECRET_KEY=2139cb7e6814e5ad7e145338964031acf66abce3d1f7f386e2cdd2cd4a8b42404599de602fd7646f2233231dba70b6969821
-      #- OBICO_AUTH_TOKEN=655105
-      #- MOONRAKER_URL=http://moonraker:7125
-      - VIDEO_STREAMING_BACKEND=janus
-      - JANUS_URL=wss://umbrel.tailc9398a.ts.net/ws
-      - JANUS_HTTP_URL=https://umbrel.tailc9398a.ts.net/janus
-      - DISABLE_VIDEO_STREAMING=False
-      - USE_GPU=False
-      - ONNXRUNTIME_DISABLE_GPU=1
-      - DEBUG=True
-      - SITE_ID=1
-      - HOST_IP=192.168.100.105:3334
+      DEBUG: 'True'
+      FLASK_APP: 'server.py'
+    tty: true
+    command: bash -c "gunicorn --bind 0.0.0.0:3333 --workers 1 wsgi"
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider --no-check-certificate http://ml_api:3333/hc/"]
+      start_period: 30s
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - internal_net
+
+  web:
+    <<: *web-defaults
+    hostname: web
+    env_file:
+      - .env
     ports:
-      - "3334:3334"   # porta principal do Obico
-      - "8000:8000"   # painel admin + WebSocket via Daphne
+      - "3334:3334"
     depends_on:
+      - ml_api
       - db
       - redis
+    command: sh -c 'python manage.py migrate && python manage.py collectstatic -v 2 --noinput && daphne -b 0.0.0.0 -p 3334 config.routing:application'
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider --no-check-certificate http://web:3334/hc/"]
+      start_period: 30s
+      interval: 90s
+      timeout: 20s
+      retries: 3
+    networks:
+      - internal_net
+
+  tasks:
+    <<: *web-defaults
+    hostname: tasks
+    env_file:
+      - .env
+    command: sh -c "celery -A config worker --beat -l info -c 2 -Q realtime,celery"
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A config inspect ping"]
+      start_period: 15s
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - internal_net
+
+  moonraker:
+    build: ./moonraker
+    container_name: moonraker
+    restart: unless-stopped
+    ports:
+      - "7125:7125"   # porta padrão do Moonraker
+    volumes:
+      - ./moonraker_config:/home/klipper/config
+      - /tmp:/tmp
+    networks:
+      - internal_net
+
+  klipper:
+    build: ./klipper
+    container_name: klipper
+    restart: unless-stopped
+    volumes:
+      - ./moonraker_config:/home/klipper/config
+      - ./moonraker_config/logs:/home/klipper/logs
+      - /tmp:/tmp
+      - /dev:/dev
+    devices:
+      - "/dev/ttyUSB0:/dev/ttyUSB0"   # ajuste conforme sua porta serial
     networks:
       - internal_net
 
 volumes:
   db_data:
-  obico_data:
   redis_data:
 
 networks:

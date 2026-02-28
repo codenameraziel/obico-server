@@ -1,0 +1,14 @@
+1 crie a build:
+################################################
+
+docker compose up --build -d
+
+2 Aplique migrações:
+################################################
+
+docker compose exec web python manage.py migrate
+
+Crie superusuário
+################################################
+
+docker compose exec web python manage.py createsuperuser --email umbrel@umbrel.com
