@@ -13,7 +13,10 @@ services:
       - REDIS_URL=redis://redis:6379
       - DATABASE_URL=postgres://obico:obico@db:5432/obico
       - ONNXRUNTIME_DISABLE_GPU=1
-      - DISABLE_VIDEO_STREAMING=True
+      - VIDEO_STREAMING_BACKEND=janus
+      - JANUS_URL=ws://umbrel.tailc9398a.ts.net:8188
+      - JANUS_HTTP_URL=http://janus-external:8088/janus
+      - DISABLE_VIDEO_STREAMING=False
       - MOONRAKER_URL=http://moonraker-obico:7125
     depends_on:
       - db
