@@ -52,7 +52,7 @@ services:
       - internal_net
 
   moonraker-obico:
-    build: ./moonraker   
+    build: ./moonraker_obico   
     container_name: moonraker-obico
     ports:
       - "7125:7125"
