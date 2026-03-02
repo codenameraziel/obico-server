@@ -25,6 +25,8 @@ services:
     volumes:
       - obico_data:/app/data
     restart: unless-stopped
+    networks:
+      - internal_net
 
   db:
     image: postgres:13
@@ -36,6 +38,8 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
     restart: unless-stopped
+    networks:
+      - internal_net
 
   redis:
     image: redis:6
@@ -43,6 +47,8 @@ services:
     volumes:
       - redis_data:/data
     restart: unless-stopped
+    networks:
+      - internal_net
 
   moonraker-obico:
     build: ./moonraker   
@@ -53,8 +59,14 @@ services:
       - ./moonraker/config:/home/pi/klipper_config
       - ./moonraker-obico.cfg:/app/moonraker-obico.cfg
     restart: unless-stopped
+    networks:
+      - internal_net
 
 volumes:
   db_data:
   obico_data:
   redis_data:
+
+networks:
+  internal_net:
+    driver: bridge
