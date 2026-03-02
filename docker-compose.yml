@@ -18,6 +18,7 @@ services:
       - JANUS_HTTP_URL=http://janus-external:8088/janus
       - DISABLE_VIDEO_STREAMING=False
       - MOONRAKER_URL=http://moonraker-obico:7125
+      - OBICO_AUTH_TOKEN=758577
     depends_on:
       - db
       - redis
