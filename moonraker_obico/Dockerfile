@@ -24,8 +24,12 @@ RUN mkdir -p printer_data/config printer_data/logs \
 COPY --chown=obico:obico --from=build /opt/venv venv
 COPY --chown=obico:obico . moonraker-obico
 
+# Garantir permissão de execução no entrypoint
+RUN chmod +x /opt/moonraker-obico/scripts/docker-entrypoint.sh
+
 USER obico
 ENV PYTHONPATH=/opt/moonraker-obico
 VOLUME ["/opt/printer_data/config", "/opt/printer_data/logs"]
+
 ENTRYPOINT ["/opt/moonraker-obico/scripts/docker-entrypoint.sh"]
 CMD ["-c", "/opt/printer_data/config/moonraker-obico.cfg"]
