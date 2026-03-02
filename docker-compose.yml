@@ -1,0 +1,73 @@
+version: "3.7"
+
+services:
+  obico:
+    image: ghcr.io/imagegenius/obico:latest
+    container_name: obico-server
+    ports:
+      - "3334:3334"
+    environment:
+      - DJANGO_SUPERUSER_EMAIL=root@example.com
+      - DJANGO_SUPERUSER_PASSWORD=supersecret
+      - HOST_IP=umbrel.tailc9398a.ts.net:3334
+      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgres://obico:obico@db:5432/obico
+      - ONNXRUNTIME_DISABLE_GPU=1
+      - VIDEO_STREAMING_BACKEND=janus
+      - JANUS_URL=ws://umbrel.tailc9398a.ts.net:8188
+      - JANUS_HTTP_URL=http://janus-external:8088/janus
+      - DISABLE_VIDEO_STREAMING=False
+      - MOONRAKER_URL=http://moonraker-obico:7125
+      - OBICO_AUTH_TOKEN=758577
+    depends_on:
+      - db
+      - redis
+      - moonraker-obico
+    volumes:
+      - obico_data:/app/data
+    restart: unless-stopped
+    networks:
+      - internal_net
+
+  db:
+    image: postgres:13
+    container_name: obico-db
+    environment:
+      - POSTGRES_USER=obico
+      - POSTGRES_PASSWORD=obico
+      - POSTGRES_DB=obico
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - internal_net
+
+  redis:
+    image: redis:6
+    container_name: obico-redis
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - internal_net
+
+  moonraker-obico:
+    build: ./moonraker_obico   
+    container_name: moonraker-obico
+    ports:
+      - "7125:7125"
+    volumes:
+      - ./moonraker/config:/home/pi/klipper_config
+      - ./moonraker-obico.cfg:/app/moonraker-obico.cfg
+    restart: unless-stopped
+    networks:
+      - internal_net
+
+volumes:
+  db_data:
+  obico_data:
+  redis_data:
+
+networks:
+  internal_net:
+    driver: bridge
