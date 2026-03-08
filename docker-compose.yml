@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   obico:
-    # Imagem correta do servidor Obico (Monolítica)
+    # Imagem correta do servidor Obico (Monolitica)
     image: ghcr.io/imagegenius/obico:latest
     container_name: obico-server
     ports:
