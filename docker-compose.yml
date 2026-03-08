@@ -52,10 +52,9 @@ services:
     image: ghcr.io/thespaghettidetective/moonraker-obico:latest
     container_name: moonraker-obico
     restart: unless-stopped
-    networks:
-      - internal_net
+    # Rede host garante acesso direto ao IP da câmera
+    network_mode: host
     volumes:
-      # Agora o container enxerga o mesmo caminho que o host
       - /home/portainer/printer_data/config:/home/portainer/printer_data/config
       - /home/portainer/printer_data/logs:/home/portainer/printer_data/logs
 
@@ -63,7 +62,3 @@ volumes:
   db_data:
   obico_data:
   redis_data:
-
-networks:
-  internal_net:
-    driver: bridge
