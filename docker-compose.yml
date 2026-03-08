@@ -2,7 +2,8 @@ version: "3.7"
 
 services:
   obico:
-    image: ghcr.io/imagegenius/obico:latest
+    # Trocado para a imagem oficial do Docker Hub para evitar erro 'denied'
+    image: obico/obico-server:latest
     container_name: obico-server
     ports:
       - "3334:3334"
@@ -49,7 +50,8 @@ services:
       - internal_net
 
   moonraker-obico:
-    image: ghcr.io/obico/moonraker-obico:latest
+    # Trocado para a imagem oficial do Docker Hub
+    image: obico/moonraker-obico:latest
     container_name: moonraker-obico
     restart: unless-stopped
     networks:
