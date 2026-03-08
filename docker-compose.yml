@@ -2,7 +2,6 @@ version: "3.7"
 
 services:
   obico:
-    # Imagem correta do servidor Obico (Monolitica)
     image: ghcr.io/imagegenius/obico:latest
     container_name: obico-server
     ports:
@@ -50,16 +49,15 @@ services:
       - internal_net
 
   moonraker-obico:
-    # O caminho oficial da imagem do plugin Moonraker
     image: ghcr.io/thespaghettidetective/moonraker-obico:latest
     container_name: moonraker-obico
     restart: unless-stopped
     networks:
       - internal_net
     volumes:
-      # Verifique se este caminho existe no seu servidor
-      - /home/portainer/printer_data/config:/opt/printer_data/config
-      - /home/portainer/printer_data/logs:/opt/printer_data/logs
+      # Agora o container enxerga o mesmo caminho que o host
+      - /home/portainer/printer_data/config:/home/portainer/printer_data/config
+      - /home/portainer/printer_data/logs:/home/portainer/printer_data/logs
 
 volumes:
   db_data:
