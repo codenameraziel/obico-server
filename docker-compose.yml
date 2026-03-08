@@ -49,14 +49,16 @@ services:
       - internal_net
 
   moonraker-obico:
-    build: ./moonraker_obico
-    dockerfile: Dockerfile
+    build:
+      context: ./moonraker_obico
+      dockerfile: Dockerfile
     container_name: moonraker-obico
     ports:
       - "7125:7125"
     volumes:
-      - ./moonraker/config:/home/pi/klipper_config
-      - ./moonraker-obico.cfg:/app/moonraker-obico.cfg
+      # Ajustado para os caminhos que seu Dockerfile usa (/opt/printer_data)
+      - ./moonraker/config:/opt/printer_data/config
+      - ./moonraker-obico.cfg:/opt/printer_data/config/moonraker-obico.cfg
     restart: unless-stopped
     networks:
       - internal_net
