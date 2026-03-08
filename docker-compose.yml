@@ -49,7 +49,8 @@ services:
       - internal_net
 
   moonraker-obico:
-    build: ./moonraker_obico   
+    build: ./moonraker_obico
+    dockerfile: Dockerfile
     container_name: moonraker-obico
     ports:
       - "7125:7125"
