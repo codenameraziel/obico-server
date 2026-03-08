@@ -2,8 +2,8 @@ version: "3.7"
 
 services:
   obico:
-    # Trocado para a imagem oficial do Docker Hub para evitar erro 'denied'
-    image: obico/obico-server:latest
+    # Imagem correta do servidor Obico (Monolítica)
+    image: ghcr.io/imagegenius/obico:latest
     container_name: obico-server
     ports:
       - "3334:3334"
@@ -50,13 +50,14 @@ services:
       - internal_net
 
   moonraker-obico:
-    # Trocado para a imagem oficial do Docker Hub
-    image: obico/moonraker-obico:latest
+    # O caminho oficial da imagem do plugin Moonraker
+    image: ghcr.io/thespaghettidetective/moonraker-obico:latest
     container_name: moonraker-obico
     restart: unless-stopped
     networks:
       - internal_net
     volumes:
+      # Verifique se este caminho existe no seu servidor
       - /home/portainer/printer_data/config:/opt/printer_data/config
       - /home/portainer/printer_data/logs:/opt/printer_data/logs
 
