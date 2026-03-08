@@ -49,19 +49,16 @@ services:
       - internal_net
 
   moonraker-obico:
-    build:
-      context: ./moonraker_obico
-      dockerfile: Dockerfile
+    # Trocado o 'build' pela imagem oficial para evitar erro de pasta não encontrada
+    image: ghcr.io/obico/moonraker-obico:latest
     container_name: moonraker-obico
-    ports:
-      - "7125:7125"
-    volumes:
-      # Ajustado para os caminhos que seu Dockerfile usa (/opt/printer_data)
-      - ./moonraker/config:/opt/printer_data/config
-      - ./moonraker-obico.cfg:/opt/printer_data/config/moonraker-obico.cfg
     restart: unless-stopped
     networks:
       - internal_net
+    volumes:
+      # Ajuste estes caminhos no seu servidor se necessário
+      - /home/portainer/printer_data/config:/opt/printer_data/config
+      - /home/portainer/printer_data/logs:/opt/printer_data/logs
 
 volumes:
   db_data:
