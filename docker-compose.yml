@@ -49,14 +49,12 @@ services:
       - internal_net
 
   moonraker-obico:
-    # Trocado o 'build' pela imagem oficial para evitar erro de pasta não encontrada
     image: ghcr.io/obico/moonraker-obico:latest
     container_name: moonraker-obico
     restart: unless-stopped
     networks:
       - internal_net
     volumes:
-      # Ajuste estes caminhos no seu servidor se necessário
       - /home/portainer/printer_data/config:/opt/printer_data/config
       - /home/portainer/printer_data/logs:/opt/printer_data/logs
 
